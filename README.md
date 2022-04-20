@@ -1,10 +1,21 @@
+# Fork information
+
+This is my version of DCS-ExportScripts made with an aim to create a
+minimal required code to support stream deck plugin with some other
+personalized changes. It's probably not suitable for you. If you're
+looking for a generic supported and updated version look here:
+
+https://github.com/asherao/DCS-ExportScripts
+
+Original readme below.
+
 # Community DCS-ExportScripts Library
 ---
 
 See forums post here: https://forums.eagle.ru/topic/283178-dcs-exportscripts-for-stream-deck-community-github-library/
 Read the wiki for export IDs: https://github.com/asherao/DCS-ExportScripts/wiki
 
-This is based off of DCS-ExportScripts (https://github.com/s-d-a/DCS-ExportScripts/wiki). The main purpose is to make customized exports for DCS-Interface (https://github.com/charlestytler/streamdeck-dcs-interface) for use with an Elgato Stream Deck. 
+This is based off of DCS-ExportScripts (https://github.com/s-d-a/DCS-ExportScripts/wiki). The main purpose is to make customized exports for DCS-Interface (https://github.com/charlestytler/streamdeck-dcs-interface) for use with an Elgato Stream Deck.
 
 Following module export luas have been modified. Applicable DCS-ExportScripts ID is in parentheses:
 - UH-60L Mod
@@ -48,4 +59,3 @@ Compatible with DCS World 2.7.6.13133
 ---
 - https://github.com/asherao/DCS-ExportScripts/wiki
 - [DCS-ExportScript Wiki and Docu](https://github.com/s-d-a/DCS-ExportScripts/wiki) (in Deutsch and English)
-
