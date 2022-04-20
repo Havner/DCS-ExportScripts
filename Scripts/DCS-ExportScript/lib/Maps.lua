@@ -7,7 +7,7 @@
 --
 -- This file contains the data to identify the loaded map.
 --
--- The data can be read in the editor. 
+-- The data can be read in the editor.
 -- Load the corresponding map and read the latitude and longitude values and write specify the decimal degree format (convert from degrees, decimal to decimal degrees).
 -- Lat1 and Long1 contain the coordinates of the upper left corner.
 -- Lat2 and Long2 contain the coordinates of the lower right corner.

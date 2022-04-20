@@ -8,9 +8,9 @@
 ExportScript.Version.genericRadio = "1.2.1"
 
 --[[
--- Config and execute in function ExportScript.ProcessDACConfigLowImportance()
+	-- Config and execute in function ExportScript.ProcessDACConfigLowImportance()
 
--- genericRadioConf for example A-10C Radio AN/ARC-164 UHF
+	-- genericRadioConf for example A-10C Radio AN/ARC-164 UHF
 	ExportScript.genericRadioConf = {}
 	ExportScript.genericRadioConf['maxRadios'] = 1                       -- numbers of aviables/supported radios
 	ExportScript.genericRadioConf[1] = {}                                -- first radio
@@ -31,11 +31,11 @@ ExportScript.Version.genericRadio = "1.2.1"
 	ExportScript.genericRadioConf[1]['Preset'] = {}                      -- preset knob active
 	ExportScript.genericRadioConf[1]['Preset']['ArgumentID'] = 161       -- ManualPreset argument id from cklickable.lua
 	ExportScript.genericRadioConf[1]['Preset']['ButtonID'] = 3001        -- preset button id from cklickable.lua
---	ExportScript.genericRadioConf[1]['Preset']['ButtonID2'] = 3002       -- preset button id from cklickable.lua
+	--	ExportScript.genericRadioConf[1]['Preset']['ButtonID2'] = 3002       -- preset button id from cklickable.lua
 	-- Preset based on switchlogic on clickabledata.lua
 	ExportScript.genericRadioConf[1]['Preset']['List'] = {[0.0]="01",[0.05]="02",[0.10]="03",[0.15]="04",[0.20]="05",[0.25]="06",[0.30]="07",[0.35]="08",[0.40]="09",[0.45]="10",[0.50]="11",[0.55]="12",[0.60]="13",[0.65]="14",[0.70]="15",[0.75]="16",[0.80]="17",[0.85]="18",[0.90]="19",[0.95]="20",[1.00]="01"}
 	ExportScript.genericRadioConf[1]['Preset']['Step'] = 0.05            -- minimal step for preset change
---	ExportScript.genericRadioConf[1]['Preset']['Step2'] = -0.05          -- minimal step for preset change
+	--	ExportScript.genericRadioConf[1]['Preset']['Step2'] = -0.05          -- minimal step for preset change
 	ExportScript.genericRadioConf[1]['Squelch'] = {}                     -- squelch switch active
 	ExportScript.genericRadioConf[1]['Squelch']['ArgumentID'] = 170      -- ManualPreset argument id from cklickable.lua
 	ExportScript.genericRadioConf[1]['Squelch']['ButtonID'] = 3010       -- squelch button id from cklickable.lua
@@ -49,12 +49,12 @@ ExportScript.Version.genericRadio = "1.2.1"
 	ExportScript.genericRadioConf[1]['ManualPreset']['ValueManual'] = 0.0-- ManualPreset Manual value from cklickable.lua
 	ExportScript.genericRadioConf[1]['ManualPreset']['ValuePreset'] = 0.1-- ManualPreset Preset value from cklickable.lua
 
-...
+	...
 
-ExportScript.genericRadio(nil, nil)]]
+	ExportScript.genericRadio(nil, nil)]]
 
 function ExportScript.genericRadio(key, value)
---ExportScript.Tools.WriteToLog('genericRadioConf: '..ExportScript.Tools.dump(ExportScript.genericRadioConf))
+	--ExportScript.Tools.WriteToLog('genericRadioConf: '..ExportScript.Tools.dump(ExportScript.genericRadioConf))
 	if type(ExportScript.genericRadioConf) ~= "table" then
 		ExportScript.Tools.WriteToLog("No Radio defined.")
 		return
@@ -62,7 +62,7 @@ function ExportScript.genericRadio(key, value)
 
 	local lRotaryFrequency_1, lRotaryFrequency_2, lVolume, lPreset, lLoad, lSquelch, lManualPreset, lPower, lDevice, lClickAction, lSetFrequency = nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil
 	local lMainPanelDevice = GetDevice(0)
-	
+
 	if ExportScript.AF.genericRadio == nil then
 		ExportScript.AF.genericRadio = 0
 	end
@@ -145,9 +145,9 @@ function ExportScript.genericRadio(key, value)
 
 	-- check Manual/Preset switch
 	if ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset'] ~= nil then
-   		if ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] == nil then
-   			ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] = ((ExportScript.Tools.round(lMainPanelDevice:get_argument_value(ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ArgumentID']), 1) == ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ValueOn']) and 1 or 0)
-   		end
+		if ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] == nil then
+			ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] = ((ExportScript.Tools.round(lMainPanelDevice:get_argument_value(ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ArgumentID']), 1) == ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ValueOn']) and 1 or 0)
+		end
 	else
 		ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] = 0
 	end
@@ -178,9 +178,9 @@ function ExportScript.genericRadio(key, value)
 		lPresetChannelFrequency = string.format("%s%s", lPresetChannel, lFrequency)
 		lPresetChannelFrequency = lPresetChannelFrequency:gsub(" ", "0")
 		lPresetChannelFrequency = lPresetChannelFrequency:gsub("-", "")
---ExportScript.Tools.WriteToLog('lPresetChannel: '..ExportScript.Tools.dump(lPresetChannel))
---ExportScript.Tools.WriteToLog('lFrequency: '..ExportScript.Tools.dump(lFrequency))
---ExportScript.Tools.WriteToLog('lPresetChannelFrequency: '..ExportScript.Tools.dump(lPresetChannelFrequency))
+		--ExportScript.Tools.WriteToLog('lPresetChannel: '..ExportScript.Tools.dump(lPresetChannel))
+		--ExportScript.Tools.WriteToLog('lFrequency: '..ExportScript.Tools.dump(lFrequency))
+		--ExportScript.Tools.WriteToLog('lPresetChannelFrequency: '..ExportScript.Tools.dump(lPresetChannelFrequency))
 		-- setFrequency == true
 		if ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['setFrequency'] then
 			-- minimal frequency, for example lMinFrequency1=220, lMinFrequency2=0 from 220.000
@@ -221,7 +221,7 @@ function ExportScript.genericRadio(key, value)
 					lTmpFrequency = string.format("%.3f", lTmpFrequency[1] + lTmpFrequency[2])
 					lTmpFrequency = tonumber(lTmpFrequency)
 					lSetFrequency = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-									 Frequency = lTmpFrequency * 1000000}
+					                 Frequency = lTmpFrequency * 1000000}
 
 				else
 					ExportScript.Tools.WriteToLog("1. generic "..ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Name'].." Radio, don't split frequency: "..lFrequency)
@@ -259,7 +259,7 @@ function ExportScript.genericRadio(key, value)
 					lTmpFrequency = string.format("%.3f", lTmpFrequency[1] + lTmpFrequency[2])
 					lTmpFrequency = tonumber(lTmpFrequency)
 					lSetFrequency = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-									 Frequency = lTmpFrequency * 1000000}
+					                 Frequency = lTmpFrequency * 1000000}
 
 				else
 					ExportScript.Tools.WriteToLog("2. generic "..ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Name'].." Radio, don't split frequency: "..lFrequency)
@@ -290,18 +290,18 @@ function ExportScript.genericRadio(key, value)
 						end
 					end
 					lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-									ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID'],
-									Value    = ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio]}
+					                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID'],
+					                Value    = ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio]}
 				else
 					if lPreset < ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio] or lPreset == 0.0 or lPreset == 2.0 then
 						lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-										ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID'],
-										Value    = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['Step']}
+						                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID'],
+						                Value    = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['Step']}
 						ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio] = lPreset
 					else
 						lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-										ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID2'],
-										Value    = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['Step2']}
+						                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['ButtonID2'],
+						                Value    = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Preset']['Step2']}
 						ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio] = lPreset
 					end
 					ExportScript.AF.genericRadioPreset[ExportScript.AF.genericRadio] = lPreset
@@ -314,8 +314,8 @@ function ExportScript.genericRadio(key, value)
 		if lVolume ~= nil and (lVolume >= 0.0 and lVolume <= 2.0) then
 			lVolume = lVolume / 2
 			lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-							ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Volume']['ButtonID'],
-							Value    = lVolume}
+			                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Volume']['ButtonID'],
+			                Value    = lVolume}
 		end
 	end
 
@@ -323,8 +323,8 @@ function ExportScript.genericRadio(key, value)
 		if ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Load']['ButtonID'] ~= nil then
 			if lLoad ~= nil and (lLoad == 0.0 or lLoad <= 1.0) then
 				lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-								ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Load']['ButtonID'],
-								Value    = lLoad}
+				                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Load']['ButtonID'],
+				                Value    = lLoad}
 			end
 		end
 	end
@@ -341,8 +341,8 @@ function ExportScript.genericRadio(key, value)
 				ExportScript.AF.genericRadioSquelch[ExportScript.AF.genericRadio] = 1.0
 			end
 			lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-							ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Squelch']['ButtonID'],
-							Value    = lSquelch}
+			                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Squelch']['ButtonID'],
+			                Value    = lSquelch}
 		end
 	end
 
@@ -358,8 +358,8 @@ function ExportScript.genericRadio(key, value)
 				ExportScript.AF.genericRadioPresetManual[ExportScript.AF.genericRadio] = 1.0
 			end
 			lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-							ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ButtonID'],
-							Value    = lManualPreset}
+			                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['ManualPreset']['ButtonID'],
+			                Value    = lManualPreset}
 		end
 	end
 
@@ -375,11 +375,11 @@ function ExportScript.genericRadio(key, value)
 				ExportScript.AF.genericRadioPower[ExportScript.AF.genericRadio] = 1.0
 			end
 			lClickAction = {DeviceID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['DeviceID'],
-							ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Power']['ButtonID'],
-							Value    = lPower}
+			                ButtonID = ExportScript.genericRadioConf[ExportScript.AF.genericRadio]['Power']['ButtonID'],
+			                Value    = lPower}
 		end
 	end
-	
+
 	ExportScript.Tools.SendDataDAC("3000", lPresetChannelFrequency)
 	ExportScript.Tools.SendDataDAC("3001", lPresetChannel)
 	ExportScript.Tools.SendDataDAC("3002", lFrequency)
@@ -392,7 +392,7 @@ function ExportScript.genericRadio(key, value)
 	else
 		ExportScript.Tools.SendDataDAC("3013", 0)
 	end
-	
+
 	if lClickAction ~= nil then
 		lDevice = GetDevice(lClickAction.DeviceID)
 		if type(lDevice) == "table" then

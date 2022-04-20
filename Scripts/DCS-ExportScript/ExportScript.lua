@@ -55,8 +55,8 @@ ExportScript.FoundNoModul   = true
 ---------------------------------------------
 
 function LuaExportStart()
--- Works once just before mission start.
--- (and before player selects their aircraft, if there is a choice!)
+	-- Works once just before mission start.
+	-- (and before player selects their aircraft, if there is a choice!)
 
 	-- 2) Setup udp sockets to talk to GlassCockpit
 	package.path  = package.path..";.\\LuaSocket\\?.lua"
@@ -79,7 +79,7 @@ function LuaExportStart()
 
 	ExportScript.NoLuaExportBeforeNextFrame = false
 	ExportScript.Tools.SelectModule()   -- point globals to Module functions and data.
-	
+
 	-- Chain previously-included export as necessary
 	if PrevExport.LuaExportStart then
 		PrevExport.LuaExportStart()
@@ -87,17 +87,17 @@ function LuaExportStart()
 end
 
 function LuaExportBeforeNextFrame()
---[[	if ExportScript.Config.Debug then
+	--[[	if ExportScript.Config.Debug then
 		ExportScript.Tools.ProcessInput()
-	else
+		else
 		ExportScript.coProcessArguments_BeforeNextFrame = coroutine.create(ExportScript.Tools.ProcessInput)
 		coStatus = coroutine.resume(ExportScript.coProcessArguments_BeforeNextFrame)
-	end
-	
-	if ExportScript.NoLuaExportBeforeNextFrame == false then
+		end
+
+		if ExportScript.NoLuaExportBeforeNextFrame == false then
 		ExportScript.Tools.ProcessOutput()
-	end
-]]	
+		end
+	]]
 	-- Chain previously-included export as necessary
 	if PrevExport.LuaExportBeforeNextFrame then
 		PrevExport.LuaExportBeforeNextFrame()
@@ -108,7 +108,7 @@ function LuaExportAfterNextFrame()
 	if ExportScript.NoLuaExportBeforeNextFrame then
 		ExportScript.Tools.ProcessOutput()
 	end
-	
+
 	-- Chain previously-included export as necessary
 	if PrevExport.LuaExportAfterNextFrame then
 		PrevExport.LuaExportAfterNextFrame()
@@ -118,10 +118,10 @@ end
 function LuaExportActivityNextEvent(t)
 	local tNext = t
 
--- Put your event code here and increase tNext for the next event
--- so this function will be called automatically at your custom
--- model times. 
--- If tNext == t then the activity will be terminated.
+	-- Put your event code here and increase tNext for the next event
+	-- so this function will be called automatically at your custom
+	-- model times.
+	-- If tNext == t then the activity will be terminated.
 
 	if ExportScript.Config.Debug then
 		ExportScript.Tools.ProcessInput()
@@ -129,22 +129,22 @@ function LuaExportActivityNextEvent(t)
 		ExportScript.coProcessArguments_BeforeNextFrame = coroutine.create(ExportScript.Tools.ProcessInput)
 		coStatus = coroutine.resume(ExportScript.coProcessArguments_BeforeNextFrame)
 	end
-	
+
 	if ExportScript.NoLuaExportBeforeNextFrame == false then
 		ExportScript.Tools.ProcessOutput()
 	end
 
 	tNext = tNext + ExportScript.Config.ExportInterval
-	
+
 	if PrevExport.LuaExportActivityNextEvent then
 		tNext=PrevExport.LuaExportActivityNextEvent(t)
 	end
-	
+
 	return tNext
 end
 
 function LuaExportStop()
--- Works once just after mission stop.
+	-- Works once just after mission stop.
 	if ExportScript.Config.DACExport then
 		ExportScript.Tools.SendDataDAC("DAC", "stop")
 		for i=1, #ExportScript.Config.DAC, 1 do
@@ -161,7 +161,7 @@ function LuaExportStop()
 	if ExportScript.Config.Listener then
 		ExportScript.UDPListener:close()
 	end
-	
+
 	ExportScript.ModuleName   = nil
 	ExportScript.FoundNoModul = false
 
@@ -171,7 +171,7 @@ function LuaExportStop()
 		ExportScript.logFile:close()
 		ExportScript.logFile = nil
 	end
-	
+
 	-- Chain previously-included export as necessary
 	if PrevExport.LuaExportStop then
 		PrevExport.LuaExportStop()
