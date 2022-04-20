@@ -21,21 +21,23 @@ function ExportScript.Tools.WriteToLog(message)
 end
 
 function ExportScript.Tools.createUDPSender()
-	ExportScript.socket = require("socket")
+	if ExportScript.Config.Sender then
+		ExportScript.socket = require("socket")
 
-	local lcreateUDPSender = ExportScript.socket.protect(function()
-			ExportScript.UDPsender = ExportScript.socket.udp()
-			ExportScript.socket.try(ExportScript.UDPsender:setsockname("*", 0))
-			--ExportScript.socket.try(ExportScript.UDPsender:settimeout(.004)) -- set the timeout for reading the socket; 250 fps
-	end)
+		local lcreateUDPSender = ExportScript.socket.protect(function()
+				ExportScript.UDPsender = ExportScript.socket.udp()
+				ExportScript.socket.try(ExportScript.UDPsender:setsockname("*", 0))
+				--ExportScript.socket.try(ExportScript.UDPsender:settimeout(.004)) -- set the timeout for reading the socket; 250 fps
+		end)
 
-	local ln, lerror = lcreateUDPSender()
-	if lerror ~= nil then
-		ExportScript.Tools.WriteToLog("createUDPSender protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
-		return
+		local ln, lerror = lcreateUDPSender()
+		if lerror ~= nil then
+			ExportScript.Tools.WriteToLog("createUDPSender protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
+			return
+		end
+
+		ExportScript.Tools.WriteToLog("Create UDPSender")
 	end
-
-	ExportScript.Tools.WriteToLog("Create UDPSender")
 end
 
 function ExportScript.Tools.createUDPListner()
@@ -70,13 +72,8 @@ function ExportScript.Tools.ProcessInput()
 		ExportScript.UDPListenerValues = {}
 
 		local lUDPListenerReceivefrom = ExportScript.socket.protect(function()
-				--[[
-					local try = ExportScript.socket.newtry(function()
-					ExportScript.UDPListener:close()
-					ExportScript.Tools.createUDPListner()
-					end)
-					ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = try(ExportScript.UDPListener:receivefrom())
-				]] -- Bei einer newtry Funktion wird im fehlerfall deren inhalt ausgeführt.
+				--local try = ExportScript.socket.newtry(function() ExportScript.UDPListener:close() ExportScript.Tools.createUDPListner() end)
+				--ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = try(ExportScript.UDPListener:receivefrom())
 				ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = ExportScript.socket.try(ExportScript.UDPListener:receivefrom())
 		end)
 
@@ -128,7 +125,6 @@ end
 
 function ExportScript.Tools.ProcessOutput()
 	local coStatus
-	--local currentTime = LoGetModelTime()
 
 	local lMyInfo = LoGetSelfData()
 	if lMyInfo ~= nil then
@@ -144,38 +140,33 @@ function ExportScript.Tools.ProcessOutput()
 
 		lDevice:update_arguments()
 
-		--if currentTime - ExportScript.lastExportTimeHI > ExportScript.Config.ExportInterval then
 		if ExportScript.Config.Debug then
-			ExportScript.Tools.WriteToLog("run hight importance export universally")
+			ExportScript.Tools.WriteToLog("Run high importance arguments")
 			ExportScript.Tools.ProcessArguments(lDevice, ExportScript.EveryFrameArguments) -- Module arguments as appropriate
 		else
 			ExportScript.coProcessArguments_EveryFrame = coroutine.create(ExportScript.Tools.ProcessArguments)
 			coStatus = coroutine.resume( ExportScript.coProcessArguments_EveryFrame, lDevice, ExportScript.EveryFrameArguments)
 		end
 
-		--ExportScript.lastExportTimeHI = currentTime
-		ExportScript.lastExportTimeHI = ExportScript.lastExportTimeHI + ExportScript.Config.ExportInterval
-		--end
+		ExportScript.lastExportTime = ExportScript.lastExportTime + ExportScript.Config.ExportInterval
 
-		--if currentTime - ExportScript.lastExportTimeLI > ExportScript.Config.ExportLowTickInterval then
-		if ExportScript.lastExportTimeHI > ExportScript.Config.ExportLowTickInterval then
+		if ExportScript.lastExportTime > ExportScript.Config.ExportLowTickInterval then
 			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("run low importance export universally")
+				ExportScript.Tools.WriteToLog("Run low importance arguments")
 				ExportScript.Tools.ProcessArguments(lDevice, ExportScript.Arguments) -- Module arguments as appropriate
 			else
 				ExportScript.coProcessArguments_Arguments = coroutine.create(ExportScript.Tools.ProcessArguments)
 				coStatus = coroutine.resume( ExportScript.coProcessArguments_Arguments, lDevice, ExportScript.Arguments)
 			end
 
-			--ExportScript.lastExportTimeLI = currentTime
-			ExportScript.lastExportTimeHI = 0
+			ExportScript.lastExportTime = 0
 		end
 
 		if ExportScript.Config.Sender then
 			ExportScript.Tools.FlushData()
 		end
 	else -- No Module found
-		if ExportScript.FoundNoModul then
+		if ExportScript.FoundNoModule then
 			ExportScript.Tools.WriteToLog("No Module Found.")
 			ExportScript.Tools.SelectModule()  -- point globals to Module functions and data.
 		end
@@ -210,7 +201,7 @@ end
 
 -- Status Gathering Functions
 function ExportScript.Tools.ProcessArguments(device, arguments)
-	local lArgument , lFormat , lArgumentValue
+	local lArgument, lFormat, lArgumentValue
 	local lCounter = 0
 
 	if ExportScript.Config.Debug then
@@ -265,14 +256,12 @@ end
 function ExportScript.Tools.FlushData()
 	local lFlushData = ExportScript.socket.protect(function()
 			if #ExportScript.SendStrings > 0 then
-				local lES_SimID = ""
-
-				lES_SimID = ExportScript.SimID
+				local lES_SimID = ExportScript.SimID
 
 				local lPacket = lES_SimID .. table.concat(ExportScript.SendStrings, ExportScript.Config.SenderSeparator) .. "\n"
-				--ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
-				local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.LastData = {} end)
-				try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
+				--local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.LastData = {} end)
+				--try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
+				ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
 
 				if ExportScript.Config.SocketDebug then
 					ExportScript.Tools.WriteToLog("FlushData: send to host: "..ExportScript.Config.SenderHost..", Port: "..ExportScript.Config.SenderPort..", Data: "..lPacket)
@@ -296,7 +285,7 @@ end
 function ExportScript.Tools.SelectModule()
 	-- Select Module...
 	ExportScript.FoundDCSModule = false
-	ExportScript.FoundNoModul   = true
+	ExportScript.FoundNoModule  = true
 
 	local lMyInfo      = LoGetSelfData()
 	if lMyInfo == nil then  -- End SelectModule, if don't selected a aircraft
@@ -311,7 +300,7 @@ function ExportScript.Tools.SelectModule()
 	local lModuleName         = ExportScript.ModuleName..".lua"
 	local lModuleFile         = ""
 
-	ExportScript.FoundNoModul = false
+	ExportScript.FoundNoModule = false
 
 	for file in lfs.dir(ExportScript.Config.ExportModulePath) do
 		if lfs.attributes(ExportScript.Config.ExportModulePath..file,"mode") == "file" then
