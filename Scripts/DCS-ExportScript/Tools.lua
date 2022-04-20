@@ -21,102 +21,116 @@ function ExportScript.Tools.WriteToLog(message)
 end
 
 function ExportScript.Tools.createUDPSender()
-	if ExportScript.Config.Sender then
-		ExportScript.socket = require("socket")
-
-		local lcreateUDPSender = ExportScript.socket.protect(function()
-				ExportScript.UDPsender = ExportScript.socket.udp()
-				ExportScript.socket.try(ExportScript.UDPsender:setsockname("*", 0))
-				--ExportScript.socket.try(ExportScript.UDPsender:settimeout(.004)) -- set the timeout for reading the socket; 250 fps
-		end)
-
-		local ln, lerror = lcreateUDPSender()
-		if lerror ~= nil then
-			ExportScript.Tools.WriteToLog("createUDPSender protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
-			return
-		end
-
-		ExportScript.Tools.WriteToLog("Create UDPSender")
+	if not ExportScript.Config.Sender then
+		return
 	end
+
+	ExportScript.socket = require("socket")
+
+	local lcreateUDPSender = ExportScript.socket.protect(function()
+			ExportScript.UDPsender = ExportScript.socket.udp()
+			ExportScript.socket.try(ExportScript.UDPsender:setsockname("*", 0))
+			--ExportScript.socket.try(ExportScript.UDPsender:settimeout(.004)) -- set the timeout for reading the socket; 250 fps
+	end)
+
+	local ln, lerror = lcreateUDPSender()
+	if lerror ~= nil then
+		ExportScript.Tools.WriteToLog("createUDPSender protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
+		return
+	end
+
+	ExportScript.Tools.WriteToLog("Create UDPSender")
 end
 
 function ExportScript.Tools.createUDPListner()
-	if ExportScript.Config.Listener then
-		ExportScript.socket = require("socket")
+	if not ExportScript.Config.Listener then
+		return
+	end
 
-		local lcreateUDPListner = ExportScript.socket.protect(function()
-				ExportScript.UDPListener = ExportScript.socket.udp()
-				ExportScript.socket.try(ExportScript.UDPListener:setsockname("*", ExportScript.Config.ListenerPort))
-				ExportScript.socket.try(ExportScript.UDPListener:settimeout(.001)) -- set the timeout for reading the socket; 250 fps
-		end)
+	ExportScript.socket = require("socket")
 
-		local ln, lerror = lcreateUDPListner()
-		if lerror ~= nil then
-			ExportScript.Tools.WriteToLog("createUDPListner protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
-			return
-		end
+	local lcreateUDPListner = ExportScript.socket.protect(function()
+			ExportScript.UDPListener = ExportScript.socket.udp()
+			ExportScript.socket.try(ExportScript.UDPListener:setsockname("*", ExportScript.Config.ListenerPort))
+			ExportScript.socket.try(ExportScript.UDPListener:settimeout(.001)) -- set the timeout for reading the socket; 250 fps
+	end)
 
-		ExportScript.Tools.WriteToLog("Create UDPListner")
+	local ln, lerror = lcreateUDPListner()
+	if lerror ~= nil then
+		ExportScript.Tools.WriteToLog("createUDPListner protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
+		return
+	end
+
+	ExportScript.Tools.WriteToLog("Create UDPListner")
+end
+
+function ExportScript.Tools.ProcessModule()
+	-- Check if module changed within a single session
+	local lMyInfo = LoGetSelfData()
+	if lMyInfo ~= nil and ExportScript.ModuleName ~= lMyInfo.Name then
+		ExportScript.Tools.SelectModule()  -- point globals to Module functions and data.
+		return
 	end
 end
 
 function ExportScript.Tools.ProcessInput()
+	if not ExportScript.Config.Listener then
+		return
+	end
+
 	local lCommand, lCommandArgs, lDevice
 	-- C1,3001,4
 	-- lComand = C
 	-- lCommandArgs[1] = 1 => lDevice
 	-- lCommandArgs[2] = 3001 => ButtonID
 	-- lCommandArgs[3] = 4 => Value
-	if ExportScript.Config.Listener then
-		--local lInput,from,port = ExportScript.UDPListener:receivefrom()
-		ExportScript.UDPListenerValues = {}
+	ExportScript.UDPListenerValues = {}
 
-		local lUDPListenerReceivefrom = ExportScript.socket.protect(function()
-				--local try = ExportScript.socket.newtry(function() ExportScript.UDPListener:close() ExportScript.Tools.createUDPListner() end)
-				--ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = try(ExportScript.UDPListener:receivefrom())
-				ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = ExportScript.socket.try(ExportScript.UDPListener:receivefrom())
-		end)
+	local lUDPListenerReceivefrom = ExportScript.socket.protect(function()
+			--local try = ExportScript.socket.newtry(function() ExportScript.UDPListener:close() ExportScript.Tools.createUDPListner() end)
+			--ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = try(ExportScript.UDPListener:receivefrom())
+			ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port = ExportScript.socket.try(ExportScript.UDPListener:receivefrom())
+	end)
 
-		local ln, lerror = lUDPListenerReceivefrom()
-		if lerror ~= nil and lerror ~= "timeout" then
-			ExportScript.Tools.WriteToLog("UDPListenerReceivefrom protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
-			ExportScript.UDPListener:close()
-			ExportScript.Tools.createUDPListner()
-		end
+	local ln, lerror = lUDPListenerReceivefrom()
+	if lerror ~= nil and lerror ~= "timeout" then
+		ExportScript.Tools.WriteToLog("UDPListenerReceivefrom protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
+		ExportScript.UDPListener:close()
+		ExportScript.Tools.createUDPListner()
+	end
 
-		local lInput, from, port = ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port
+	local lInput, from, port = ExportScript.UDPListenerValues.Input, ExportScript.UDPListenerValues.from, ExportScript.UDPListenerValues.port
 
-		if ExportScript.Config.SocketDebug then
-			ExportScript.Tools.WriteToLog("lInput: "..ExportScript.Tools.dump(lInput)..", from: "..ExportScript.Tools.dump(from)..", port: "..ExportScript.Tools.dump(port))
-		end
-		if lInput then
-			lCommand = string.sub(lInput,1,1)
+	if ExportScript.Config.SocketDebug then
+		ExportScript.Tools.WriteToLog("lInput: "..ExportScript.Tools.dump(lInput)..", from: "..ExportScript.Tools.dump(from)..", port: "..ExportScript.Tools.dump(port))
+	end
+	if lInput then
+		lCommand = string.sub(lInput,1,1)
 
-			if (lCommand == "C") then
-				lCommandArgs = ExportScript.Tools.StrSplit(string.sub(lInput,2),",")
-				lDeviceID = tonumber(lCommandArgs[1])
-				if lDeviceID < 1000 then
-					-- DCS Modules
-					lDevice = GetDevice(lCommandArgs[1])
-					if ExportScript.FoundDCSModule and type(lDevice) == "table" then
-						lDevice:performClickableAction(lCommandArgs[2],lCommandArgs[3])
-						if ExportScript.Config.Debug then
-							ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lCommandArgs[1]..", ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
-						end
-					end
-				elseif lDeviceID == 3000 then
-					-- Raw
-					local lCommandID = tonumber(lCommandArgs[2])
-					local lCommandArgs = tonumber(lCommandArgs[3])
-					if lCommandID >= 396 and lCommandID <= 405 and lCommandArgs == 0 then
-						-- snap view reset
-						LoSetCommand(406)
-					else
-						LoSetCommand(lCommandID)
-					end
+		if (lCommand == "C") then
+			lCommandArgs = ExportScript.Tools.StrSplit(string.sub(lInput,2),",")
+			lDeviceID = tonumber(lCommandArgs[1])
+			if lDeviceID < 1000 then
+				-- DCS Modules
+				lDevice = GetDevice(lCommandArgs[1])
+				if ExportScript.FoundDCSModule and type(lDevice) == "table" then
+					lDevice:performClickableAction(lCommandArgs[2],lCommandArgs[3])
 					if ExportScript.Config.Debug then
-						ExportScript.Tools.WriteToLog("LoSetCommand RAW, CommandID: "..lCommandID)
+						ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lCommandArgs[1]..", ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
 					end
+				end
+			elseif lDeviceID == 3000 then
+				-- Raw
+				local lCommandID = tonumber(lCommandArgs[2])
+				local lCommandArgs = tonumber(lCommandArgs[3])
+				if lCommandID >= 396 and lCommandID <= 405 and lCommandArgs == 0 then
+					-- snap view reset
+					LoSetCommand(406)
+				else
+					LoSetCommand(lCommandID)
+				end
+				if ExportScript.Config.Debug then
+					ExportScript.Tools.WriteToLog("LoSetCommand RAW, CommandID: "..lCommandID)
 				end
 			end
 		end
@@ -124,20 +138,14 @@ function ExportScript.Tools.ProcessInput()
 end
 
 function ExportScript.Tools.ProcessOutput()
-	local coStatus
-
-	local lMyInfo = LoGetSelfData()
-	if lMyInfo ~= nil then
-		if ExportScript.ModuleName ~= lMyInfo.Name then
-			ExportScript.Tools.SelectModule()  -- point globals to Module functions and data.
-			return
-		end
-		lMyInfo = nil
+	if not ExportScript.Config.Sender then
+		return
 	end
+
+	local coStatus
 
 	local lDevice = GetDevice(0)
 	if type(lDevice) == "table" and ExportScript.FoundDCSModule then
-
 		lDevice:update_arguments()
 
 		if ExportScript.Config.Debug then
@@ -162,14 +170,7 @@ function ExportScript.Tools.ProcessOutput()
 			ExportScript.lastExportTime = 0
 		end
 
-		if ExportScript.Config.Sender then
-			ExportScript.Tools.FlushData()
-		end
-	else -- No Module found
-		if ExportScript.FoundNoModule then
-			ExportScript.Tools.WriteToLog("No Module Found.")
-			ExportScript.Tools.SelectModule()  -- point globals to Module functions and data.
-		end
+		ExportScript.Tools.FlushData()
 	end
 end
 
@@ -214,9 +215,7 @@ function ExportScript.Tools.ProcessArguments(device, arguments)
 			lCounter = lCounter + 1
 			ExportScript.Tools.WriteToLog(lCounter..". ID: "..lArgument..", Fromat: "..lFormat..", Value: "..lArgumentValue)
 		end
-		if ExportScript.Config.Sender then
-			ExportScript.Tools.SendData(lArgument, lArgumentValue)
-		end
+		ExportScript.Tools.SendData(lArgument, lArgumentValue)
 	end
 
 	if ExportScript.Config.Debug then
@@ -285,10 +284,10 @@ end
 function ExportScript.Tools.SelectModule()
 	-- Select Module...
 	ExportScript.FoundDCSModule = false
-	ExportScript.FoundNoModule  = true
 
-	local lMyInfo      = LoGetSelfData()
+	local lMyInfo = LoGetSelfData()
 	if lMyInfo == nil then  -- End SelectModule, if don't selected a aircraft
+		ExportScript.Tools.WriteToLog("No module info present")
 		return
 	end
 
@@ -296,11 +295,10 @@ function ExportScript.Tools.SelectModule()
 		ExportScript.Tools.WriteToLog("MyInfo: "..ExportScript.Tools.dump(lMyInfo))
 	end
 
+	ExportScript.LastData     = {}
 	ExportScript.ModuleName   = lMyInfo.Name
 	local lModuleName         = ExportScript.ModuleName..".lua"
 	local lModuleFile         = ""
-
-	ExportScript.FoundNoModule = false
 
 	for file in lfs.dir(ExportScript.Config.ExportModulePath) do
 		if lfs.attributes(ExportScript.Config.ExportModulePath..file,"mode") == "file" then
@@ -310,7 +308,9 @@ function ExportScript.Tools.SelectModule()
 		end
 	end
 
-	ExportScript.Tools.WriteToLog("File Path: "..lModuleFile)
+	if ExportScript.Config.Debug then
+		ExportScript.Tools.WriteToLog("File Path: "..lModuleFile)
+	end
 
 	if string.len(lModuleFile) > 1 then
 		-- load Aircraft File
@@ -321,57 +321,47 @@ function ExportScript.Tools.SelectModule()
 		end
 
 		ExportScript.Tools.WriteToLog("File '"..lModuleFile.."' loaded")
+	end
 
-		ExportScript.Tools.WriteToLog("Version:")
-		for k,v in pairs(ExportScript.Version) do
-			ExportScript.Tools.WriteToLog(k..": "..v)
+	ExportScript.Tools.WriteToLog("Version of loaded files:")
+	for k,v in pairs(ExportScript.Version) do
+		ExportScript.Tools.WriteToLog(k..": "..v)
+	end
+
+	if ExportScript.FoundDCSModule then
+		local lCounter = 0
+		local lArray = {}
+		for k, v in pairs(ExportScript.ConfigEveryFrameArguments) do
+			lCounter = lCounter + 1
+			local lV = v
+			if lV == "%.4f" or lV == "%.3f" then
+				lV = "%.2f"
+			end
+			lArray[k] = lV
 		end
-
-		ExportScript.LastData = {}
-
-		if ExportScript.FoundDCSModule then
-			local lCounter = 0
-			local lArray = {}
-			for k, v in pairs(ExportScript.ConfigEveryFrameArguments) do
-				lCounter = lCounter + 1
-				local lV = v
-				if lV == "%.4f" or lV == "%.3f" then
-					lV = "%.2f"
-				end
-				lArray[k] = lV
-			end
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("ExportScript.ConfigEveryFrameArguments Count: "..lCounter)
-			end
-			ExportScript.EveryFrameArguments = lArray
-
-			lCounter = 0
-			lArray = {}
-			for k, v in pairs(ExportScript.ConfigArguments) do
-				lCounter = lCounter + 1
-				local lV = v
-				if lV == "%.4f" or lV == "%.3f" then
-					lV = "%.2f"
-				end
-				lArray[k] = lV
-			end
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("ExportScript.ConfigArguments Count: "..lCounter)
-			end
-			ExportScript.Arguments = lArray
-		else
-			ExportScript.Tools.WriteToLog("Unknown Module Type: "..lMyInfo.Name)
+		if ExportScript.Config.Debug then
+			ExportScript.Tools.WriteToLog("ExportScript.ConfigEveryFrameArguments Count: "..lCounter)
 		end
+		ExportScript.EveryFrameArguments = lArray
 
-	else -- Unknown Module
-		ExportScript.EveryFrameArguments            = {}
-		ExportScript.Arguments                      = {}
-
-		ExportScript.Tools.WriteToLog("Version:")
-		for k,v in pairs(ExportScript.Version) do
-			ExportScript.Tools.WriteToLog(k..": "..v)
+		lCounter = 0
+		lArray = {}
+		for k, v in pairs(ExportScript.ConfigArguments) do
+			lCounter = lCounter + 1
+			local lV = v
+			if lV == "%.4f" or lV == "%.3f" then
+				lV = "%.2f"
+			end
+			lArray[k] = lV
 		end
-		ExportScript.Tools.WriteToLog("Unknown Module Name: "..lMyInfo.Name)
+		if ExportScript.Config.Debug then
+			ExportScript.Tools.WriteToLog("ExportScript.ConfigArguments Count: "..lCounter)
+		end
+		ExportScript.Arguments = lArray
+	else
+		ExportScript.EveryFrameArguments   = {}
+		ExportScript.Arguments             = {}
+		ExportScript.Tools.WriteToLog("Unknown Module: "..lMyInfo.Name)
 	end
 end
 

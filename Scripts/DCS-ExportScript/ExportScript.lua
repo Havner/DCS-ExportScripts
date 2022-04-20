@@ -23,7 +23,6 @@ dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Tools.lua]])
 
 -- Found DCS or FC Module
 ExportScript.FoundDCSModule = false
-ExportScript.FoundNoModule  = true
 
 ---------------------------------------------
 -- DCS Export API Function Implementations --
@@ -52,6 +51,8 @@ function LuaExportStart()
 end
 
 function LuaExportActivityNextEvent(t)
+	ExportScript.Tools.ProcessModule()
+
 	if ExportScript.Config.Debug then
 		ExportScript.Tools.ProcessInput()
 	else
@@ -69,15 +70,14 @@ function LuaExportStop()
 	if ExportScript.Config.Sender then
 		ExportScript.Tools.SendData("Ikarus", "stop")
 		ExportScript.Tools.FlushData()
+		ExportScript.UDPsender:close()
 	end
 
-	ExportScript.UDPsender:close()
 	if ExportScript.Config.Listener then
 		ExportScript.UDPListener:close()
 	end
 
-	ExportScript.ModuleName    = nil
-	ExportScript.FoundNoModule = false
+	ExportScript.ModuleName = nil
 
 	if ExportScript.logFile then
 		ExportScript.Tools.WriteToLog("====== Logfile close ======")
