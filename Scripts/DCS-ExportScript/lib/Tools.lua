@@ -176,26 +176,6 @@ function ExportScript.Tools.ProcessOutput()
 			coStatus = coroutine.resume( ExportScript.coProcessArguments_EveryFrame, lDevice, ExportScript.EveryFrameArguments)
 		end
 
-		if ExportScript.Config.IkarusExport then
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("run hight importance export Ikarus")
-				ExportScript.ProcessIkarusDCSHighImportance(lDevice) -- Module, as appropriate; determined in ExportScript.Tools.SelectModule()
-			else
-				ExportScript.coProcessIkarusDCSHighImportance = coroutine.create(ExportScript.ProcessIkarusDCSHighImportance)
-				coStatus = coroutine.resume( ExportScript.coProcessIkarusDCSHighImportance, lDevice)
-			end
-		end
-
-		if ExportScript.Config.DACExport then
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("run hight importance export DAC")
-				ExportScript.ProcessDACHighImportance(lDevice) -- Module, as appropriate; determined in ExportScript.Tools.SelectModule()
-			else
-				ExportScript.coProcessDACHighImportance = coroutine.create(ExportScript.ProcessDACHighImportance)
-				coStatus = coroutine.resume( ExportScript.coProcessDACHighImportance, lDevice)
-			end
-		end
-
 		if ExportScript.FirstNewDataSend and ExportScript.FirstNewDataSendCount == 0 then
 			if ExportScript.Config.DACExport then
 				ExportScript.Tools.ResetChangeValuesDAC()
@@ -221,26 +201,6 @@ function ExportScript.Tools.ProcessOutput()
 			else
 				ExportScript.coProcessArguments_Arguments = coroutine.create(ExportScript.Tools.ProcessArguments)
 				coStatus = coroutine.resume( ExportScript.coProcessArguments_Arguments, lDevice, ExportScript.Arguments)
-			end
-
-			if ExportScript.Config.IkarusExport then
-				if ExportScript.Config.Debug then
-					ExportScript.Tools.WriteToLog("run low importance export Ikarus")
-					ExportScript.ProcessIkarusDCSLowImportance(lDevice) -- Module as appropriate; determined in ExportScript.Tools.SelectModule()
-				else
-					ExportScript.coProcessIkarusDCSLowImportance = coroutine.create(ExportScript.ProcessIkarusDCSLowImportance)
-					coStatus = coroutine.resume( ExportScript.coProcessIkarusDCSLowImportance, lDevice)
-				end
-			end
-
-			if ExportScript.Config.DACExport then
-				if ExportScript.Config.Debug then
-					ExportScript.Tools.WriteToLog("run low importance export DAC")
-					ExportScript.ProcessDACLowImportance(lDevice) -- Module, as appropriate; determined in ExportScript.Tools.SelectModule()
-				else
-					ExportScript.coProcessDACLowImportance = coroutine.create(ExportScript.ProcessDACLowImportance)
-					coStatus = coroutine.resume( ExportScript.coProcessDACLowImportance, lDevice)
-				end
 			end
 
 			--ExportScript.lastExportTimeLI = currentTime
@@ -623,11 +583,6 @@ function ExportScript.Tools.SelectModule()
 				ExportScript.Tools.WriteToLog("ExportScript.ConfigArguments Count: "..lCounter)
 			end
 			ExportScript.Arguments = lArray
-
-			ExportScript.ProcessIkarusDCSHighImportance = ExportScript.ProcessIkarusDCSConfigHighImportance
-			ExportScript.ProcessIkarusDCSLowImportance  = ExportScript.ProcessIkarusDCSConfigLowImportance
-			ExportScript.ProcessDACHighImportance       = ExportScript.ProcessDACConfigHighImportance
-			ExportScript.ProcessDACLowImportance        = ExportScript.ProcessDACConfigLowImportance
 		else
 			ExportScript.Tools.WriteToLog("Unknown Module Type: "..lMyInfo.Name)
 		end
@@ -647,12 +602,6 @@ function ExportScript.Tools.SelectModule()
 		end
 
 	else -- Unknown Module
-		ExportScript.ProcessIkarusDCSHighImportance = ExportScript.ProcessIkarusDCSHighImportanceNoConfig
-		ExportScript.ProcessIkarusDCSLowImportance  = ExportScript.ProcessIkarusDCSLowImportanceNoConfig
-		ExportScript.ProcessIkarusFCHighImportance  = ExportScript.ProcessIkarusFCHighImportanceNoConfig
-		ExportScript.ProcessIkarusFCLowImportance   = ExportScript.ProcessIkarusFCLowImportanceNoConfig
-		ExportScript.ProcessDACHighImportance       = ExportScript.ProcessDACHighImportanceNoConfig
-		ExportScript.ProcessDACLowImportance        = ExportScript.ProcessDACLowImportanceNoConfig
 		ExportScript.EveryFrameArguments            = {}
 		ExportScript.Arguments                      = {}
 
@@ -879,23 +828,4 @@ function ExportScript.Tools.ValueInTable(Table, Value)
 		end
 	end
 	return false
-end
-
--- Pointed to by ExportScript.ProcessIkarusDCSHighImportance, if the player aircraft is something else
-function ExportScript.ProcessIkarusDCSHighImportanceNoConfig(mainPanelDevice)
-end
--- Pointed to by ExportScript.ProcessIkarusDCSLowImportance, if the player aircraft is something else
-function ExportScript.ProcessIkarusDCSLowImportanceNoConfig(mainPanelDevice)
-end
-
--- the player aircraft is a Flaming Cliffs or similar aircraft
-function ExportScript.ProcessIkarusFCHighImportanceNoConfig()
-end
-function ExportScript.ProcessIkarusFCLowImportanceNoConfig()
-end
-
--- Hardware exports
-function ExportScript.ProcessDACHighImportanceNoConfig(mainPanelDevice)
-end
-function ExportScript.ProcessDACLowImportanceNoConfig(mainPanelDevice)
 end
