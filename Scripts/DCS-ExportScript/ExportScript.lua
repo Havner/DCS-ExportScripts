@@ -26,8 +26,6 @@ ExportScript.lastExportTimeLI       = 0
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Config.lua]])
 ExportScript.utf8 = dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\utf8.lua]])
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Tools.lua]])
-dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\genericRadio.lua]])
-dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Maps.lua]])
 
 for i = 1, #ExportScript.Config.DAC, 1 do
 	ExportScript.PacketSizeDAC[i]  = 0

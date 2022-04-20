@@ -122,14 +122,6 @@ function ExportScript.Tools.ProcessInput()
 							ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lCommandArgs[1]..", ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
 						end
 					end
-				elseif lDeviceID == 1000 then
-					-- ExportScript.genericRadio(key, value)
-					if ExportScript.FoundDCSModule then
-						ExportScript.genericRadio(lCommandArgs[2],lCommandArgs[3])
-						if ExportScript.Config.Debug then
-							ExportScript.Tools.WriteToLog("genericRadio, ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
-						end
-					end
 				elseif lDeviceID == 3000 then
 					-- Raw
 					local lCommandID = tonumber(lCommandArgs[2])
@@ -585,20 +577,6 @@ function ExportScript.Tools.SelectModule()
 			ExportScript.Arguments = lArray
 		else
 			ExportScript.Tools.WriteToLog("Unknown Module Type: "..lMyInfo.Name)
-		end
-
-		if ExportScript.Config.IkarusExport then
-			for Map, LatLong in pairs(ExportScript.Maps) do
-				if lMyInfo.LatLongAlt.Lat > LatLong.Lat2 and lMyInfo.LatLongAlt.Lat < LatLong.Lat1 then
-					if lMyInfo.LatLongAlt.Long > LatLong.Long1 and lMyInfo.LatLongAlt.Long < LatLong.Long2 then
-						ExportScript.Tools.WriteToLog("Detected Map: "..Map)
-						ExportScript.Tools.SendData("Map", Map)
-						break
-					end
-				end
-			end
-
-			ExportScript.Tools.FlushData()
 		end
 
 	else -- Unknown Module
