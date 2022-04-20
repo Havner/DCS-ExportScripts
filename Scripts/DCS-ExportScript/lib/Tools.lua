@@ -102,12 +102,6 @@ function ExportScript.Tools.ProcessInput()
 						ExportScript.Tools.WriteToLog("Reset fuer Ikarus Daten")
 					end
 				end
-				if ExportScript.Config.DACExport then
-					ExportScript.Tools.ResetChangeValuesDAC()
-					if ExportScript.Config.Debug then
-						ExportScript.Tools.WriteToLog("Reset fuer DAC Daten")
-					end
-				end
 			end
 
 			if (lCommand == "C") then
@@ -169,9 +163,6 @@ function ExportScript.Tools.ProcessOutput()
 		end
 
 		if ExportScript.FirstNewDataSend and ExportScript.FirstNewDataSendCount == 0 then
-			if ExportScript.Config.DACExport then
-				ExportScript.Tools.ResetChangeValuesDAC()
-			end
 			if ExportScript.Config.IkarusExport then
 				ExportScript.Tools.WriteToLog("reset dcs ikarus")
 				ExportScript.Tools.ResetChangeValues()
@@ -201,12 +192,6 @@ function ExportScript.Tools.ProcessOutput()
 
 		if ExportScript.Config.IkarusExport then
 			ExportScript.Tools.FlushData()
-		end
-
-		if ExportScript.Config.DACExport then
-			for i=1, #ExportScript.Config.DAC, 1 do
-				ExportScript.Tools.FlushDataDAC(i)
-			end
 		end
 	else -- No Module found
 		if ExportScript.FoundNoModul then
@@ -313,9 +298,6 @@ function ExportScript.Tools.ProcessArguments(device, arguments)
 		if ExportScript.Config.IkarusExport then
 			ExportScript.Tools.SendData(lArgument, lArgumentValue)
 		end
-		if ExportScript.Config.DACExport then
-			ExportScript.Tools.SendDataDAC(lArgument, lArgumentValue)
-		end
 	end
 
 	if ExportScript.Config.Debug then
@@ -349,43 +331,6 @@ function ExportScript.Tools.SendData(id, value)
 		table.insert(ExportScript.SendStrings, ldata)
 		ExportScript.LastData[id] = value
 		ExportScript.PacketSize   = ExportScript.PacketSize + ldataLen + 1
-	end
-end
-
--- Network Functions for DAC
-function ExportScript.Tools.SendDataDAC(id, value)
-	for hardware=1, #ExportScript.Config.DAC, 1 do
-		if id == nil then
-			ExportScript.Tools.WriteToLog("Export id is nil")
-			return
-		end
-		if value == nil then
-			ExportScript.Tools.WriteToLog("Value for id "..id.." is nil")
-			return
-		end
-		if ExportScript.Config.DAC[hardware] == nil then
-			ExportScript.Tools.WriteToLog("unknown hardware ID '"..hardware.."' for value: '"..id.."="..value.."'")
-			return
-		end
-
-		if string.len(value) > 3 and value == string.sub("-0.00000000",1, string.len(value)) then
-			value = value:sub(2)
-		end
-
-		if ExportScript.LastDataDAC[hardware][id] == nil or ExportScript.LastDataDAC[hardware][id] ~= value then
-			local ldata    =  id .. "=" .. value
-			local ldataLen = string.len(ldata)
-
-			if ldataLen + ExportScript.PacketSizeDAC[hardware] > 576 then
-				ExportScript.Tools.FlushDataDAC(hardware)
-			end
-
-			table.insert(ExportScript.SendStringsDAC[hardware], ldata)
-			ExportScript.LastDataDAC[hardware][id] = value
-			ExportScript.PacketSizeDAC[hardware]   = ExportScript.PacketSizeDAC[hardware] + ldataLen + 1
-			--ExportScript.Tools.WriteToLog("id=ldata: "..ldata)
-			--ExportScript.Tools.WriteToLog("ExportScript.LastDataDAC["..hardware.."]: "..ExportScript.Tools.dump(ExportScript.LastDataDAC[hardware]))
-		end
 	end
 end
 
@@ -444,49 +389,8 @@ function ExportScript.Tools.FlushData()
 	end
 end
 
-
-function ExportScript.Tools.FlushDataDAC(hardware)
-	hardware = hardware or 1
-
-	if ExportScript.Config.DAC[hardware] == nil then
-		ExportScript.Tools.WriteToLog("FlushDataDAC: unknown hardware ID '"..hardware.."'")
-		return
-	end
-
-	local lFlushDataDAC = ExportScript.socket.protect(function()
-			if #ExportScript.SendStringsDAC[hardware] > 0 then
-				local lPacket = ExportScript.SimID .. table.concat(ExportScript.SendStringsDAC[hardware], ExportScript.Config.DAC[hardware].Separator) .. "\n"
-				--ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.DAC[hardware].Host, ExportScript.Config.DAC[hardware].SendPort))
-				local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.Tools.ResetChangeValuesDAC() end)
-				try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.DAC[hardware].Host, ExportScript.Config.DAC[hardware].SendPort))
-
-				if ExportScript.Config.SocketDebug then
-					ExportScript.Tools.WriteToLog("FlushDataDAC["..hardware.."]: send to host: "..ExportScript.Config.DAC[hardware].Host..", Port: "..ExportScript.Config.DAC[hardware].SendPort..", Data: "..lPacket)
-				end
-
-				ExportScript.SendStringsDAC[hardware] = {}
-				ExportScript.PacketSizeDAC[hardware]  = 0
-			else
-				if ExportScript.Config.SocketDebug then
-					ExportScript.Tools.WriteToLog("FlushDataDAC["..hardware.."]: nothing sent")
-				end
-			end
-	end)
-
-	local ln, lerror = lFlushDataDAC()
-	if lerror ~= nil then
-		ExportScript.Tools.WriteToLog("FlushDataDAC protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
-	end
-end
-
 function ExportScript.Tools.ResetChangeValues()
 	ExportScript.LastData   = {}
-end
-
-function ExportScript.Tools.ResetChangeValuesDAC()
-	for i = 1, #ExportScript.Config.DAC, 1 do
-		ExportScript.LastDataDAC[i] = {}
-	end
 end
 
 function ExportScript.Tools.SelectModule()
@@ -520,16 +424,8 @@ function ExportScript.Tools.SelectModule()
 	ExportScript.Tools.WriteToLog("File Path: "..lModuleFile)
 
 	if string.len(lModuleFile) > 1 then
-		ExportScript.Tools.ResetChangeValuesDAC()
-
 		-- load Aircraft File
 		dofile(lModuleFile)
-		if ExportScript.Config.DACExport then
-			ExportScript.Tools.SendDataDAC("File", lMyInfo.Name)
-			for i=1, #ExportScript.Config.DAC, 1 do
-				ExportScript.Tools.FlushDataDAC(i)
-			end
-		end
 
 		if ExportScript.Config.IkarusExport then
 			ExportScript.Tools.SendData("File", lMyInfo.Name)

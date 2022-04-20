@@ -16,22 +16,12 @@ ExportScript.PacketSize     = 0
 ExportScript.SendStrings    = {}
 ExportScript.LastData       = {}
 
-ExportScript.PacketSizeDAC  = {}
-ExportScript.SendStringsDAC = {}
-ExportScript.LastDataDAC    = {}
-
 ExportScript.lastExportTimeHI       = 0
 ExportScript.lastExportTimeLI       = 0
 
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Config.lua]])
 ExportScript.utf8 = dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\utf8.lua]])
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Tools.lua]])
-
-for i = 1, #ExportScript.Config.DAC, 1 do
-	ExportScript.PacketSizeDAC[i]  = 0
-	ExportScript.SendStringsDAC[i] = {}
-	ExportScript.LastDataDAC[i]    = {}
-end
 
 -- Found DCS or FC Module
 ExportScript.FoundDCSModule = false
@@ -82,13 +72,6 @@ end
 
 function LuaExportStop()
 	-- Works once just after mission stop.
-	if ExportScript.Config.DACExport then
-		ExportScript.Tools.SendDataDAC("DAC", "stop")
-		for i=1, #ExportScript.Config.DAC, 1 do
-			ExportScript.Tools.FlushDataDAC(i)
-		end
-	end
-
 	if ExportScript.Config.IkarusExport then
 		ExportScript.Tools.SendData("Ikarus", "stop")
 		ExportScript.Tools.FlushData()
