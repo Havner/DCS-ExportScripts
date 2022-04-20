@@ -142,31 +142,21 @@ function ExportScript.Tools.ProcessOutput()
 		return
 	end
 
-	local coStatus
-
 	local lDevice = GetDevice(0)
 	if type(lDevice) == "table" and ExportScript.FoundDCSModule then
 		lDevice:update_arguments()
 
 		if ExportScript.Config.Debug then
 			ExportScript.Tools.WriteToLog("Run high importance arguments")
-			ExportScript.Tools.ProcessArguments(lDevice, ExportScript.EveryFrameArguments) -- Module arguments as appropriate
-		else
-			ExportScript.coProcessArguments_EveryFrame = coroutine.create(ExportScript.Tools.ProcessArguments)
-			coStatus = coroutine.resume( ExportScript.coProcessArguments_EveryFrame, lDevice, ExportScript.EveryFrameArguments)
 		end
-
+		ExportScript.Tools.ProcessArguments(lDevice, ExportScript.EveryFrameArguments)
 		ExportScript.lastExportTime = ExportScript.lastExportTime + ExportScript.Config.ExportInterval
 
 		if ExportScript.lastExportTime > ExportScript.Config.ExportLowTickInterval then
 			if ExportScript.Config.Debug then
 				ExportScript.Tools.WriteToLog("Run low importance arguments")
-				ExportScript.Tools.ProcessArguments(lDevice, ExportScript.Arguments) -- Module arguments as appropriate
-			else
-				ExportScript.coProcessArguments_Arguments = coroutine.create(ExportScript.Tools.ProcessArguments)
-				coStatus = coroutine.resume( ExportScript.coProcessArguments_Arguments, lDevice, ExportScript.Arguments)
 			end
-
+			ExportScript.Tools.ProcessArguments(lDevice, ExportScript.Arguments) -- Module arguments as appropriate
 			ExportScript.lastExportTime = 0
 		end
 

@@ -52,14 +52,7 @@ end
 
 function LuaExportActivityNextEvent(t)
 	ExportScript.Tools.ProcessModule()
-
-	if ExportScript.Config.Debug then
-		ExportScript.Tools.ProcessInput()
-	else
-		ExportScript.coProcessArguments_BeforeNextFrame = coroutine.create(ExportScript.Tools.ProcessInput)
-		coStatus = coroutine.resume(ExportScript.coProcessArguments_BeforeNextFrame)
-	end
-
+	ExportScript.Tools.ProcessInput()
 	ExportScript.Tools.ProcessOutput()
 
 	return t + ExportScript.Config.ExportInterval
