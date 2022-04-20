@@ -47,7 +47,6 @@ end
 
 -- Found DCS or FC Module
 ExportScript.FoundDCSModule = false
-ExportScript.FoundFCModule  = false
 ExportScript.FoundNoModul   = true
 
 ---------------------------------------------

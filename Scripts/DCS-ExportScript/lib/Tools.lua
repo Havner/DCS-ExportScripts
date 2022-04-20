@@ -130,28 +130,6 @@ function ExportScript.Tools.ProcessInput()
 							ExportScript.Tools.WriteToLog("genericRadio, ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
 						end
 					end
-				elseif lDeviceID == 2000 then
-					-- Flaming Cliffs Module (Buttons)
-					if ExportScript.FoundFCModule then
-						-- ComamndID > 3000, because DAC or Ikarus add 300 to CommandID
-						local lComandID = (tonumber(lCommandArgs[2]) - 3000)
-						if tonumber(lCommandArgs[3]) == 1.0 then
-							LoSetCommand(lComandID)
-							if ExportScript.Config.Debug then
-								ExportScript.Tools.WriteToLog("LoSetCommand, CommandID: "..lComandID)
-							end
-						end
-					end
-				elseif lDeviceID == 2001 then
-					-- Flaming Cliffs Module (analog axies)
-					if ExportScript.FoundFCModule then
-						-- ComamndID > 3000, because DAC or Ikarus add 3000 to CommandID
-						local lComandID = (tonumber(lCommandArgs[2]) - 3000)
-						LoSetCommand(lComandID, lCommandArgs[3])
-						if ExportScript.Config.Debug then
-							ExportScript.Tools.WriteToLog("LoSetCommand, CommandID: "..lComandID..", Value: "..lCommandArgs[3])
-						end
-					end
 				end
 			end
 		end
@@ -247,83 +225,6 @@ function ExportScript.Tools.ProcessOutput()
 				if ExportScript.Config.Debug then
 					ExportScript.Tools.WriteToLog("run low importance export DAC")
 					ExportScript.ProcessDACLowImportance(lDevice) -- Module, as appropriate; determined in ExportScript.Tools.SelectModule()
-				else
-					ExportScript.coProcessDACLowImportance = coroutine.create(ExportScript.ProcessDACLowImportance)
-					coStatus = coroutine.resume( ExportScript.coProcessDACLowImportance, lDevice)
-				end
-			end
-
-			--ExportScript.lastExportTimeLI = currentTime
-			ExportScript.lastExportTimeHI = 0
-		end
-
-		if ExportScript.Config.IkarusExport then
-			ExportScript.Tools.FlushData()
-		end
-
-		if ExportScript.Config.DACExport then
-			for i=1, #ExportScript.Config.DAC, 1 do
-				ExportScript.Tools.FlushDataDAC(i)
-			end
-		end
-	elseif ExportScript.FoundFCModule then -- Assume FC Aircraft
-
-		ExportScript.AF.EventNumber = os.clock() --tonumber(tostring(os.clock()):gsub(".", ""))
-
-		--if currentTime - ExportScript.lastExportTimeHI > ExportScript.Config.ExportInterval then
-
-		if ExportScript.Config.IkarusExport then
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("run hight importance export Ikarus")
-				ExportScript.ProcessIkarusFCHighImportance()
-			else
-				ExportScript.coProcessGlassCockpitFCHighImportance = coroutine.create(ExportScript.ProcessIkarusFCHighImportance)
-				coStatus = coroutine.resume( ExportScript.coProcessGlassCockpitFCHighImportance)
-			end
-		end
-		if ExportScript.Config.DACExport then
-			if ExportScript.Config.Debug then
-				ExportScript.Tools.WriteToLog("run hight importance export DAC")
-				ExportScript.ProcessDACHighImportance(lDevice)
-			else
-				ExportScript.coProcessDACHighImportance = coroutine.create(ExportScript.ProcessDACHighImportance)
-				coStatus = coroutine.resume( ExportScript.coProcessDACHighImportance, lDevice)
-			end
-		end
-
-		if ExportScript.FirstNewDataSend and ExportScript.FirstNewDataSendCount == 0 then
-			if ExportScript.Config.DACExport then
-				ExportScript.Tools.ResetChangeValuesDAC()
-			end
-			if ExportScript.Config.IkarusExport then
-				ExportScript.Tools.WriteToLog("reset fc ikarus")
-				ExportScript.Tools.ResetChangeValues()
-			end
-			ExportScript.FirstNewDataSend = false
-		else
-			ExportScript.FirstNewDataSendCount = ExportScript.FirstNewDataSendCount - 1
-		end
-
-		--ExportScript.lastExportTimeHI = currentTime
-		ExportScript.lastExportTimeHI = ExportScript.lastExportTimeHI + ExportScript.Config.ExportInterval
-		--end
-
-		--if currentTime - ExportScript.lastExportTimeLI > ExportScript.Config.ExportLowTickInterval then
-		if ExportScript.lastExportTimeHI > ExportScript.Config.ExportLowTickInterval then
-			if ExportScript.Config.IkarusExport then
-				if ExportScript.Config.Debug then
-					ExportScript.Tools.WriteToLog("run low importance export Ikarus")
-					ExportScript.ProcessIkarusFCLowImportance()
-				else
-					ExportScript.coProcessIkarusFCLowImportance = coroutine.create(ExportScript.ProcessIkarusFCLowImportance)
-					coStatus = coroutine.resume( ExportScript.coProcessIkarusFCLowImportance)
-				end
-			end
-
-			if ExportScript.Config.DACExport then
-				if ExportScript.Config.Debug then
-					ExportScript.Tools.WriteToLog("run low importance export DAC")
-					ExportScript.ProcessDACLowImportance(lDevice)
 				else
 					ExportScript.coProcessDACLowImportance = coroutine.create(ExportScript.ProcessDACLowImportance)
 					coStatus = coroutine.resume( ExportScript.coProcessDACLowImportance, lDevice)
@@ -627,7 +528,6 @@ end
 function ExportScript.Tools.SelectModule()
 	-- Select Module...
 	ExportScript.FoundDCSModule = false
-	ExportScript.FoundFCModule  = false
 	ExportScript.FoundNoModul   = true
 
 	local lMyInfo      = LoGetSelfData()
@@ -711,12 +611,6 @@ function ExportScript.Tools.SelectModule()
 
 			ExportScript.ProcessIkarusDCSHighImportance = ExportScript.ProcessIkarusDCSConfigHighImportance
 			ExportScript.ProcessIkarusDCSLowImportance  = ExportScript.ProcessIkarusDCSConfigLowImportance
-			ExportScript.ProcessDACHighImportance       = ExportScript.ProcessDACConfigHighImportance
-			ExportScript.ProcessDACLowImportance        = ExportScript.ProcessDACConfigLowImportance
-
-		elseif ExportScript.FoundFCModule then
-			ExportScript.ProcessIkarusFCHighImportance  = ExportScript.ProcessIkarusFCHighImportanceConfig
-			ExportScript.ProcessIkarusFCLowImportance   = ExportScript.ProcessIkarusFCLowImportanceConfig
 			ExportScript.ProcessDACHighImportance       = ExportScript.ProcessDACConfigHighImportance
 			ExportScript.ProcessDACLowImportance        = ExportScript.ProcessDACConfigLowImportance
 		else
