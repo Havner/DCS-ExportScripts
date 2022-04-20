@@ -20,7 +20,6 @@ ExportScript.lastExportTimeHI       = 0
 ExportScript.lastExportTimeLI       = 0
 
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Config.lua]])
-ExportScript.utf8 = dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\utf8.lua]])
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Tools.lua]])
 
 -- Found DCS or FC Module
