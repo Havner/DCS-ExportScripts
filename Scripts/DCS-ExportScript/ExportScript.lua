@@ -20,7 +20,7 @@ ExportScript.lastExportTimeHI       = 0
 ExportScript.lastExportTimeLI       = 0
 
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Config.lua]])
-dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Tools.lua]])
+dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Tools.lua]])
 
 -- Found DCS or FC Module
 ExportScript.FoundDCSModule = false
