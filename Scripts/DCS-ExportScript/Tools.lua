@@ -205,21 +205,21 @@ function ExportScript.Tools.ProcessArguments(device, arguments)
 	local lArgument, lFormat, lArgumentValue
 	local lCounter = 0
 
-	if ExportScript.Config.Debug then
-		ExportScript.Tools.WriteToLog("======Begin========")
+	if ExportScript.Config.DataDebug then
+		ExportScript.Tools.WriteToLog("====== Data Begin ========")
 	end
 
 	for lArgument, lFormat in pairs(arguments) do
 		lArgumentValue = string.format(lFormat,device:get_argument_value(lArgument))
-		if ExportScript.Config.Debug then
+		if ExportScript.Config.DataDebug then
 			lCounter = lCounter + 1
 			ExportScript.Tools.WriteToLog(lCounter..". ID: "..lArgument..", Fromat: "..lFormat..", Value: "..lArgumentValue)
 		end
 		ExportScript.Tools.SendData(lArgument, lArgumentValue)
 	end
 
-	if ExportScript.Config.Debug then
-		ExportScript.Tools.WriteToLog("======End========")
+	if ExportScript.Config.DataDebug then
+		ExportScript.Tools.WriteToLog("======= Data End =========")
 	end
 end
 
