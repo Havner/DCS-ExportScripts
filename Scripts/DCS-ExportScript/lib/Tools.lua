@@ -1,4 +1,4 @@
--- Ikarus and D.A.C. Export Script
+-- DCS Export Script
 --
 -- Tools
 --
@@ -96,11 +96,11 @@ function ExportScript.Tools.ProcessInput()
 			lCommand = string.sub(lInput,1,1)
 
 			if lCommand == "R" then -- R == Reset
-				if ExportScript.Config.IkarusExport then
-					ExportScript.Tools.ResetChangeValues()
+				if ExportScript.Config.Sender then
 					if ExportScript.Config.Debug then
-						ExportScript.Tools.WriteToLog("Reset fuer Ikarus Daten")
+						ExportScript.Tools.WriteToLog("Reset for Sender Data")
 					end
+					ExportScript.Tools.ResetChangeValues()
 				end
 			end
 
@@ -163,8 +163,10 @@ function ExportScript.Tools.ProcessOutput()
 		end
 
 		if ExportScript.FirstNewDataSend and ExportScript.FirstNewDataSendCount == 0 then
-			if ExportScript.Config.IkarusExport then
-				ExportScript.Tools.WriteToLog("reset dcs ikarus")
+			if ExportScript.Config.Sender then
+				if ExportScript.Config.Debug then
+					ExportScript.Tools.WriteToLog("Reset for Sender Data")
+				end
 				ExportScript.Tools.ResetChangeValues()
 			end
 			ExportScript.FirstNewDataSend = false
@@ -190,7 +192,7 @@ function ExportScript.Tools.ProcessOutput()
 			ExportScript.lastExportTimeHI = 0
 		end
 
-		if ExportScript.Config.IkarusExport then
+		if ExportScript.Config.Sender then
 			ExportScript.Tools.FlushData()
 		end
 	else -- No Module found
@@ -295,7 +297,7 @@ function ExportScript.Tools.ProcessArguments(device, arguments)
 			lCounter = lCounter + 1
 			ExportScript.Tools.WriteToLog(lCounter..". ID: "..lArgument..", Fromat: "..lFormat..", Value: "..lArgumentValue)
 		end
-		if ExportScript.Config.IkarusExport then
+		if ExportScript.Config.Sender then
 			ExportScript.Tools.SendData(lArgument, lArgumentValue)
 		end
 	end
@@ -334,30 +336,6 @@ function ExportScript.Tools.SendData(id, value)
 	end
 end
 
---[[
-	function ExportScript.Tools.FlushData()
-	if #ExportScript.SendStrings > 0 then
-	local lES_SimID = ""
-
-	lES_SimID = ExportScript.SimID
-
-	local lPacket = lES_SimID .. table.concat(ExportScript.SendStrings, ExportScript.Config.IkarusSeparator) .. "\n"
-	ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.IkarusHost, ExportScript.Config.IkarusPort))
-
-	if ExportScript.Config.SocketDebug then
-	ExportScript.Tools.WriteToLog("FlushData: send the following data to host: "..ExportScript.Config.IkarusHost..", Port: "..ExportScript.Config.IkarusPort..", Data: "..lPacket)
-	end
-
-	ExportScript.SendStrings = {}
-	ExportScript.PacketSize  = 0
-	else
-	if ExportScript.Config.SocketDebug then
-	ExportScript.Tools.WriteToLog("FlushData: nothing sent")
-	end
-	end
-	end
-]]
-
 function ExportScript.Tools.FlushData()
 	local lFlushData = ExportScript.socket.protect(function()
 			if #ExportScript.SendStrings > 0 then
@@ -365,13 +343,13 @@ function ExportScript.Tools.FlushData()
 
 				lES_SimID = ExportScript.SimID
 
-				local lPacket = lES_SimID .. table.concat(ExportScript.SendStrings, ExportScript.Config.IkarusSeparator) .. "\n"
-				--ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.IkarusHost, ExportScript.Config.IkarusPort))
+				local lPacket = lES_SimID .. table.concat(ExportScript.SendStrings, ExportScript.Config.SenderSeparator) .. "\n"
+				--ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
 				local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.Tools.ResetChangeValues() end)
-				try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.IkarusHost, ExportScript.Config.IkarusPort))
+				try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
 
 				if ExportScript.Config.SocketDebug then
-					ExportScript.Tools.WriteToLog("FlushData: send to host: "..ExportScript.Config.IkarusHost..", Port: "..ExportScript.Config.IkarusPort..", Data: "..lPacket)
+					ExportScript.Tools.WriteToLog("FlushData: send to host: "..ExportScript.Config.SenderHost..", Port: "..ExportScript.Config.SenderPort..", Data: "..lPacket)
 				end
 
 				ExportScript.SendStrings = {}
@@ -427,7 +405,7 @@ function ExportScript.Tools.SelectModule()
 		-- load Aircraft File
 		dofile(lModuleFile)
 
-		if ExportScript.Config.IkarusExport then
+		if ExportScript.Config.Sender then
 			ExportScript.Tools.SendData("File", lMyInfo.Name)
 		end
 

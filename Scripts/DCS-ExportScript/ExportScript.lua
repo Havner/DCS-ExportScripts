@@ -1,4 +1,4 @@
--- Ikarus and D.A.C. Export Script
+-- DCS Export Script
 --
 -- Copyright by Michael aka McMicha 2014 - 2018
 -- Contact dcs2arcaze.micha@farbpigmente.org
@@ -72,7 +72,7 @@ end
 
 function LuaExportStop()
 	-- Works once just after mission stop.
-	if ExportScript.Config.IkarusExport then
+	if ExportScript.Config.Sender then
 		ExportScript.Tools.SendData("Ikarus", "stop")
 		ExportScript.Tools.FlushData()
 	end

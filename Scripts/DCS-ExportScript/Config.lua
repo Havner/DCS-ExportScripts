@@ -1,4 +1,4 @@
--- Ikarus and D.A.C. Export Script
+-- DCS Export Script
 --
 -- Config File
 --
@@ -8,15 +8,15 @@
 ExportScript.Config = {}
 ExportScript.Version.Config = "1.2.1"
 
--- Ikarus a Glass Cockpit Software
-ExportScript.Config.IkarusExport    = true         -- false for not use
-ExportScript.Config.IkarusHost      = "127.0.0.1"  -- IP for Ikarus
-ExportScript.Config.IkarusPort      = 1725         -- Port Ikarus (1625)
-ExportScript.Config.IkarusSeparator = ":"
+-- Sender config
+ExportScript.Config.Sender          = true          -- false for not use
+ExportScript.Config.SenderHost      = "127.0.0.1"   -- Sender IP
+ExportScript.Config.SenderPort      = 1725          -- Sender Port
+ExportScript.Config.SenderSeparator = ":"
 
--- Ikarus and D.A.C. can data send
+-- Listener config
 ExportScript.Config.Listener         = true         -- false for not use
-ExportScript.Config.ListenerPort     = 26027        -- Listener Port for D.A.C.
+ExportScript.Config.ListenerPort     = 26027        -- Listener Port
 
 -- Other
 ExportScript.Config.ExportInterval         = 0.05	-- export evry 0.05 secounds
