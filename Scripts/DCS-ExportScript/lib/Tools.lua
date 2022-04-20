@@ -130,6 +130,19 @@ function ExportScript.Tools.ProcessInput()
 							ExportScript.Tools.WriteToLog("genericRadio, ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
 						end
 					end
+				elseif lDeviceID == 3000 then
+					-- Raw
+					local lCommandID = tonumber(lCommandArgs[2])
+					local lCommandArgs = tonumber(lCommandArgs[3])
+					if lCommandID >= 396 and lCommandID <= 405 and lCommandArgs == 0 then
+						-- snap view reset
+						LoSetCommand(406)
+					else
+						LoSetCommand(lCommandID)
+					end
+					if ExportScript.Config.Debug then
+						ExportScript.Tools.WriteToLog("LoSetCommand RAW, CommandID: "..lCommandID)
+					end
 				end
 			end
 		end
