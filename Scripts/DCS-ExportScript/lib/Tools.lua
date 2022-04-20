@@ -596,31 +596,34 @@ function ExportScript.Tools.SelectModule()
 
 		if ExportScript.FoundDCSModule then
 			local lCounter = 0
+			local lArray = {}
 			for k, v in pairs(ExportScript.ConfigEveryFrameArguments) do
 				lCounter = lCounter + 1
+				local lV = v
+				if lV == "%.4f" or lV == "%.3f" then
+					lV = "%.2f"
+				end
+				lArray[k] = lV
 			end
 			if ExportScript.Config.Debug then
 				ExportScript.Tools.WriteToLog("ExportScript.ConfigEveryFrameArguments Count: "..lCounter)
 			end
-			if lCounter > 0 then
-				ExportScript.EveryFrameArguments = ExportScript.ConfigEveryFrameArguments
-			else
-				-- no Arguments
-				ExportScript.EveryFrameArguments = {}
-			end
+			ExportScript.EveryFrameArguments = lArray
+
 			lCounter = 0
+			lArray = {}
 			for k, v in pairs(ExportScript.ConfigArguments) do
 				lCounter = lCounter + 1
+				local lV = v
+				if lV == "%.4f" or lV == "%.3f" then
+					lV = "%.2f"
+				end
+				lArray[k] = lV
 			end
 			if ExportScript.Config.Debug then
 				ExportScript.Tools.WriteToLog("ExportScript.ConfigArguments Count: "..lCounter)
 			end
-			if lCounter > 0 then
-				ExportScript.Arguments = ExportScript.ConfigArguments
-			else
-				-- no Arguments
-				ExportScript.Arguments = {}
-			end
+			ExportScript.Arguments = lArray
 
 			ExportScript.ProcessIkarusDCSHighImportance = ExportScript.ProcessIkarusDCSConfigHighImportance
 			ExportScript.ProcessIkarusDCSLowImportance  = ExportScript.ProcessIkarusDCSConfigLowImportance
