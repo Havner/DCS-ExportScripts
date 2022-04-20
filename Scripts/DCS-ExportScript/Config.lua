@@ -25,5 +25,3 @@ ExportScript.Config.LogPath                = lfs.writedir()..[[Logs\Export.log]]
 ExportScript.Config.ExportModulePath       = lfs.writedir()..[[Scripts\DCS-ExportScript\ExportsModules\]]
 ExportScript.Config.Debug                  = false
 ExportScript.Config.SocketDebug            = false
-ExportScript.Config.FirstNewDataSend       = true
-ExportScript.Config.FirstNewDataSendCount  = 100

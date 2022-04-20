@@ -95,15 +95,6 @@ function ExportScript.Tools.ProcessInput()
 		if lInput then
 			lCommand = string.sub(lInput,1,1)
 
-			if lCommand == "R" then -- R == Reset
-				if ExportScript.Config.Sender then
-					if ExportScript.Config.Debug then
-						ExportScript.Tools.WriteToLog("Reset for Sender Data")
-					end
-					ExportScript.Tools.ResetChangeValues()
-				end
-			end
-
 			if (lCommand == "C") then
 				lCommandArgs = ExportScript.Tools.StrSplit(string.sub(lInput,2),",")
 				lDeviceID = tonumber(lCommandArgs[1])
@@ -160,18 +151,6 @@ function ExportScript.Tools.ProcessOutput()
 		else
 			ExportScript.coProcessArguments_EveryFrame = coroutine.create(ExportScript.Tools.ProcessArguments)
 			coStatus = coroutine.resume( ExportScript.coProcessArguments_EveryFrame, lDevice, ExportScript.EveryFrameArguments)
-		end
-
-		if ExportScript.FirstNewDataSend and ExportScript.FirstNewDataSendCount == 0 then
-			if ExportScript.Config.Sender then
-				if ExportScript.Config.Debug then
-					ExportScript.Tools.WriteToLog("Reset for Sender Data")
-				end
-				ExportScript.Tools.ResetChangeValues()
-			end
-			ExportScript.FirstNewDataSend = false
-		else
-			ExportScript.FirstNewDataSendCount = ExportScript.FirstNewDataSendCount - 1
 		end
 
 		--ExportScript.lastExportTimeHI = currentTime
@@ -292,7 +271,7 @@ function ExportScript.Tools.FlushData()
 
 				local lPacket = lES_SimID .. table.concat(ExportScript.SendStrings, ExportScript.Config.SenderSeparator) .. "\n"
 				--ExportScript.socket.try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
-				local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.Tools.ResetChangeValues() end)
+				local try = ExportScript.socket.newtry(function() ExportScript.UDPsender:close() ExportScript.Tools.createUDPSender() ExportScript.LastData = {} end)
 				try(ExportScript.UDPsender:sendto(lPacket, ExportScript.Config.SenderHost, ExportScript.Config.SenderPort))
 
 				if ExportScript.Config.SocketDebug then
@@ -312,10 +291,6 @@ function ExportScript.Tools.FlushData()
 	if lerror ~= nil then
 		ExportScript.Tools.WriteToLog("FlushData protect: "..ExportScript.Tools.dump(ln)..", "..ExportScript.Tools.dump(lerror))
 	end
-end
-
-function ExportScript.Tools.ResetChangeValues()
-	ExportScript.LastData   = {}
 end
 
 function ExportScript.Tools.SelectModule()
@@ -363,8 +338,7 @@ function ExportScript.Tools.SelectModule()
 			ExportScript.Tools.WriteToLog(k..": "..v)
 		end
 
-		ExportScript.FirstNewDataSend      = ExportScript.Config.FirstNewDataSend
-		ExportScript.FirstNewDataSendCount = ExportScript.Config.FirstNewDataSendCount
+		ExportScript.LastData = {}
 
 		if ExportScript.FoundDCSModule then
 			local lCounter = 0
