@@ -23,16 +23,6 @@ ExportScript.LastDataDAC    = {}
 ExportScript.lastExportTimeHI       = 0
 ExportScript.lastExportTimeLI       = 0
 
-ExportScript.NoLuaExportBeforeNextFrame = false
-
-local PrevExport                    = {}
-PrevExport.LuaExportStart           = LuaExportStart
-PrevExport.LuaExportStop            = LuaExportStop
-PrevExport.LuaExportBeforeNextFrame = LuaExportBeforeNextFrame
-PrevExport.LuaExportAfterNextFrame  = LuaExportAfterNextFrame
---fix wwt
-PrevExport.LuaExportActivityNextEvent  = LuaExportActivityNextEvent
-
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\Config.lua]])
 ExportScript.utf8 = dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\utf8.lua]])
 dofile(lfs.writedir()..[[Scripts\DCS-ExportScript\lib\Tools.lua]])
@@ -76,52 +66,10 @@ function LuaExportStart()
 
 	ExportScript.AF = {} -- Table for Auxiliary functions
 
-	ExportScript.NoLuaExportBeforeNextFrame = false
 	ExportScript.Tools.SelectModule()   -- point globals to Module functions and data.
-
-	-- Chain previously-included export as necessary
-	if PrevExport.LuaExportStart then
-		PrevExport.LuaExportStart()
-	end
-end
-
-function LuaExportBeforeNextFrame()
-	--[[	if ExportScript.Config.Debug then
-		ExportScript.Tools.ProcessInput()
-		else
-		ExportScript.coProcessArguments_BeforeNextFrame = coroutine.create(ExportScript.Tools.ProcessInput)
-		coStatus = coroutine.resume(ExportScript.coProcessArguments_BeforeNextFrame)
-		end
-
-		if ExportScript.NoLuaExportBeforeNextFrame == false then
-		ExportScript.Tools.ProcessOutput()
-		end
-	]]
-	-- Chain previously-included export as necessary
-	if PrevExport.LuaExportBeforeNextFrame then
-		PrevExport.LuaExportBeforeNextFrame()
-	end
-end
-
-function LuaExportAfterNextFrame()
-	if ExportScript.NoLuaExportBeforeNextFrame then
-		ExportScript.Tools.ProcessOutput()
-	end
-
-	-- Chain previously-included export as necessary
-	if PrevExport.LuaExportAfterNextFrame then
-		PrevExport.LuaExportAfterNextFrame()
-	end
 end
 
 function LuaExportActivityNextEvent(t)
-	local tNext = t
-
-	-- Put your event code here and increase tNext for the next event
-	-- so this function will be called automatically at your custom
-	-- model times.
-	-- If tNext == t then the activity will be terminated.
-
 	if ExportScript.Config.Debug then
 		ExportScript.Tools.ProcessInput()
 	else
@@ -129,17 +77,9 @@ function LuaExportActivityNextEvent(t)
 		coStatus = coroutine.resume(ExportScript.coProcessArguments_BeforeNextFrame)
 	end
 
-	if ExportScript.NoLuaExportBeforeNextFrame == false then
-		ExportScript.Tools.ProcessOutput()
-	end
+	ExportScript.Tools.ProcessOutput()
 
-	tNext = tNext + ExportScript.Config.ExportInterval
-
-	if PrevExport.LuaExportActivityNextEvent then
-		tNext=PrevExport.LuaExportActivityNextEvent(t)
-	end
-
-	return tNext
+	return t + ExportScript.Config.ExportInterval
 end
 
 function LuaExportStop()
@@ -169,10 +109,5 @@ function LuaExportStop()
 		ExportScript.logFile:flush()
 		ExportScript.logFile:close()
 		ExportScript.logFile = nil
-	end
-
-	-- Chain previously-included export as necessary
-	if PrevExport.LuaExportStop then
-		PrevExport.LuaExportStop()
 	end
 end
