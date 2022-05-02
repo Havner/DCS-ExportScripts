@@ -111,12 +111,28 @@ function ExportScript.Tools.ProcessInput()
 			lCommandArgs = ExportScript.Tools.StrSplit(string.sub(lInput,2),",")
 			lDeviceID = tonumber(lCommandArgs[1])
 			if lDeviceID < 1000 then
+				local lCommandID = tonumber(lCommandArgs[2])
+				local lCommandArg = tonumber(lCommandArgs[3])
+				-- NS430 workaround
+				if lDeviceID == 257 and lCommandArg == 0 then
+					if lCommandID == 1 then
+						lCommandID = 30
+					elseif lCommandID == 4 then
+						lCommandID = 31
+					elseif lCommandID == 9 then
+						lCommandID = 32
+					elseif lCommandID == 27 then
+						lCommandID = 46
+					else
+						lCommandID = lCommandID + 21
+					end
+				end
 				-- DCS Modules
-				lDevice = GetDevice(lCommandArgs[1])
+				lDevice = GetDevice(lDeviceID)
 				if ExportScript.FoundDCSModule and type(lDevice) == "table" then
-					lDevice:performClickableAction(lCommandArgs[2],lCommandArgs[3])
+					lDevice:performClickableAction(lCommandID,lCommandArg)
 					if ExportScript.Config.Debug then
-						ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lCommandArgs[1]..", ButtonID: "..lCommandArgs[2]..", Value: "..lCommandArgs[3])
+						ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lDeviceID..", ButtonID: "..lCommandID..", Value: "..lCommandArg)
 					end
 				end
 			elseif lDeviceID == 3000 then
