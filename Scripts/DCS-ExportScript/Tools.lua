@@ -130,7 +130,7 @@ function ExportScript.Tools.ProcessInput()
 				-- DCS Modules
 				lDevice = GetDevice(lDeviceID)
 				if ExportScript.FoundDCSModule and type(lDevice) == "table" then
-					lDevice:performClickableAction(lCommandID,lCommandArg)
+					lDevice:performClickableAction(lCommandID, lCommandArg)
 					if ExportScript.Config.Debug then
 						ExportScript.Tools.WriteToLog("performClickableAction for Device: "..lDeviceID..", ButtonID: "..lCommandID..", Value: "..lCommandArg)
 					end
@@ -142,6 +142,8 @@ function ExportScript.Tools.ProcessInput()
 				if lCommandID >= 396 and lCommandID <= 405 and lCommandArgs == 0 then
 					-- snap view reset
 					LoSetCommand(406)
+				elseif lCommandID == 1602 then
+					LoSetCommand(lCommandID, lCommandArgs)
 				else
 					LoSetCommand(lCommandID)
 				end
