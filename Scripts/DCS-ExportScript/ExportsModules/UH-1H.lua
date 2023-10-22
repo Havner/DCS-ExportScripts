@@ -388,9 +388,9 @@ ExportScript.ConfigArguments =
 	-- VHF ARC-134
 	[6] = "%1d",		-- Comm Test Button
 	[7] = "%.2f",		-- Frequency MHz / Power. Right mouse click to cycle power. Rotate mouse wheel to change frequency value, Button {0.85, 1.0}
-	[5] = "%.1f",		-- Frequency MHz / Power. Right mouse click to cycle power. Rotate mouse wheel to change frequency value (Axis) {0.0, 1.0} in 0.1 Steps
+	[5] = "%.2f",		-- Frequency MHz / Power. Right mouse click to cycle power. Rotate mouse wheel to change frequency value (Axis) {0.0, 1.0} in 0.1 Steps
 	[8] = "%.2f",		-- Frequency kHz / Volume. Rotate mouse wheel to change frequency value. Left or Right click to adjust volume (Axis) {0.0, 0.65} in 0.05 Steps
-	[9] = "%.1f",		-- Frequency kHz / Volume. Rotate mouse wheel to change frequency value. Left or Right click to adjust volume (Axis) {0.0, 1.0} in 0.1 Steps
+	[9] = "%.2f",		-- Frequency kHz / Volume. Rotate mouse wheel to change frequency value. Left or Right click to adjust volume (Axis) {0.0, 1.0} in 0.1 Steps
 	-- Intercom Control Panel
 	[29] = "%.4f",		-- Intercom volume (Axis) {0.3,1.0} in 0.1 Steps
 	[23] = "%1d",		-- VHF AM Radio Receiver
@@ -476,7 +476,7 @@ ExportScript.ConfigArguments =
 	[440] = "%.4f",		-- Pilot Sighting Station Intensity (Axis) {0.0,1.0} in 0.1 Steps
 	[441] = "%.4f",		-- Sight Elevation (Axis) {-1.0,1.0} in 0.1 Steps
 	-- Windshield Wipers
-	[227] = "%1d",		-- Pilot/Both/Operator {-1.0,0.0,1.0}
+	[227] = "%.2f",		-- Pilot/Both/Operator {-1.0,0.0,1.0}
 	[229] = "%.1f",		-- Wipers Speed PARK/OFF/LOW/MED/HIGH input{-1.0,0.0,1.0} output{0.0,0.1,0.2,0.3,0.4}
 	-- Stick
 	[189] = "%1d",		-- Force Trim ON/OFF (Pilot)

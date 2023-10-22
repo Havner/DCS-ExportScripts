@@ -795,7 +795,7 @@ ExportScript.ConfigArguments =
 	[492] = "%.4f",		--PTR-RSPE-LVR-REDGRP2 (Rh RedLights Brightness Rst gr.2) {0.0, 1.0}
 	[894] = "%.4f",		--PTR-RSPE-LVR-REDGRP003 (Central RedLights Brightness Rst gr.1) {0.0, 1.0}
 	[895] = "%.4f",		--PTR-RSPE-LVR-REDGRP004 (Central RedLights Brightness Rst gr.2) {0.0, 1.0}
-	[914] = "%.4f",		--PTR-RSPE-LVR-REDGRP005 (5.5V Lights Brightness Rheostat)
+	[924] = "%.4f",		--PTR-RSPE-LVR-REDGRP005 (5.5V Lights Brightness Rheostat)
 	[511] = "%1d",		--PTR-RSPE-TMB-DUTY (Cargo Cabin Duty Lights Switc)
 	[512] = "%1d",		--PTR-RSPE-TMB-ALL (Cargo Cabin Common Lights Switch)
 	-------------------------------------------------
@@ -902,7 +902,7 @@ ExportScript.ConfigArguments =
 	--------------------------------------------------------------------------------
 	-- UV-26 CMD Control Panel
 	[910] = "%1d",		--PTR-UV26-ONOFF (CMD Power)
-	[859] = "%1d",		--PTR-UV26-BOARD (CMD Select Left/Both/Right board flares dispensers)
+	[859] = "%.2f",		--PTR-UV26-BOARD (CMD Select Left/Both/Right board flares dispensers)
 	[913] = "%1d",		--PTR-UV26-PROG (CMD Amount flares counter/Programming)
 	[914] = "%1d",		--PTR-L45-BTN (CMD Num of sequences)
 	[862] = "%1d",		--PTR-L68-BTN (CMD Dispense interval) 
@@ -913,8 +913,8 @@ ExportScript.ConfigArguments =
 	[865] = "%1d",		--PTR-STOP-BTN (CMD Stop dispense)
 	------------------------------------------------
 	-- CPTMECH
-	[215] = "%1d",		--PTR-BLISTER-LOCK-L (Left blister open/close)
-	[216] = "%1d",		--PTR-BLISTER-LOCK-R (Right blister open/close)
+	[215] = "%.2f",		--PTR-BLISTER-LOCK-L (Left blister open/close)
+	[216] = "%.2f",		--PTR-BLISTER-LOCK-R (Right blister open/close)
 
 	[881] = "%1d",		--PTR-WHEELBRK-ARM (Wheel Brakes) 
 

@@ -1,7 +1,7 @@
 -- Ka-50 Export
 
 ExportScript.FoundDCSModule = true
-ExportScript.Version.Ka50 = "1.2.1"
+ExportScript.Version.Ka50_3 = "1.2.1"
 
 ExportScript.ConfigEveryFrameArguments = 
 {
