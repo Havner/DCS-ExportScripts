@@ -20,6 +20,11 @@ VL_LuaExportActivityNextEvent = LuaExportActivityNextEvent;
 VL_LuaExportStart = LuaExportStart;
 VL_LuaExportStop = LuaExportStop;
 
+-- load the Raygun script
+dofile(lfs.writedir()..[[Scripts\raygun\DCS-raygun.lua]])
+RG_LuaExportStart = LuaExportStart;
+RG_LuaExportStop = LuaExportStop;
+
 
 function LuaExportActivityNextEvent(t)
     WW_LuaExportActivityNextEvent(t);
@@ -33,10 +38,12 @@ function LuaExportStart()
     WW_LuaExportStart();
     DE_LuaExportStart();
     VL_LuaExportStart();
+    RG_LuaExportStart();
 end
 
 function LuaExportStop()
     WW_LuaExportStop();
     DE_LuaExportStop();
     VL_LuaExportStop();
+    RG_LuaExportStop();
 end
