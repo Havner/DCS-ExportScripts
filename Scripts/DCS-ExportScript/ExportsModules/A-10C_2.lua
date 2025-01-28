@@ -1,7 +1,7 @@
 -- A-10C
 
 ExportScript.FoundDCSModule = true
-ExportScript.Version.A10C = "1.2.1"
+ExportScript.Version.A10C_2 = "1.2.1"
 
 ExportScript.ConfigEveryFrameArguments = 
 {
@@ -732,6 +732,8 @@ ExportScript.ConfigArguments =
 	
 	-- HMCS
 	[550] = "%1d",     -- HMCS Switch (1,0,-1)
+	-- STICK
+	[999] = "%1d",     -- Stick (0,1)
 }
 
 -----------------------------
