@@ -25,6 +25,11 @@ dofile(lfs.writedir()..[[Scripts\raygun\DCS-raygun.lua]])
 RG_LuaExportStart = LuaExportStart;
 RG_LuaExportStop = LuaExportStop;
 
+-- load the TelemFFB script
+dofile(lfs.writedir()..[[Scripts\vpforce\TelemFFB.lua]])
+VP_LuaExportStart = LuaExportStart;
+VP_LuaExportStop = LuaExportStop;
+
 
 function LuaExportActivityNextEvent(t)
     WW_LuaExportActivityNextEvent(t);
@@ -39,6 +44,7 @@ function LuaExportStart()
     DE_LuaExportStart();
     VL_LuaExportStart();
     RG_LuaExportStart();
+    VP_LuaExportStart();
 end
 
 function LuaExportStop()
@@ -46,4 +52,5 @@ function LuaExportStop()
     DE_LuaExportStop();
     VL_LuaExportStop();
     RG_LuaExportStop();
+    VP_LuaExportStop();
 end
