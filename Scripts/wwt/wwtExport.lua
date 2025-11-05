@@ -17,6 +17,8 @@ do
 		_winwing.clock=0
 		_winwing.delay=1.0
 		_winwing.interval=0.03
+		_winwing.lastHeartbeatTime=0
+		_winwing.heartbeatInterval=3
 		_winwing.json=loadfile("Scripts\\JSON.lua")()
 		local _dev=nil
 		local _devVal=nil
@@ -101,6 +103,9 @@ do
 						_winwing.net.send(_send)
 					elseif _get["func"]=="clearOutput" then--清空输出
 						_winwing.output={}
+						local _send={}
+						_send["func"]="clearOutput"
+						_winwing.net.send(_send)
 					elseif _get["func"]=="addCommon" then--添加公共接口（变化输出）
 						--遍历数据并添加
 						for _key,_arg in pairs(_get["args"]) do
@@ -123,9 +128,12 @@ do
 								_send["args"][_key]=tostring(_err)
 							end
 						end
-						_winwing.net.send(_send)
+						_winwing.net.send(_send) 
 					elseif _get["func"]=="clearCommon" then--清空公共接口
 						_winwing.common={}
+						local _send={}
+						_send["func"]="clearCommon"
+						_winwing.net.send(_send)
 					elseif _get["func"]=="original" then--原始接口
 						local _func,_err=loadstring(_get["msg"])
 						if _func then
@@ -157,6 +165,14 @@ do
 			end
 
 			_winwing.sendNet=function(t)
+				--心跳
+				if t-_winwing.lastHeartbeatTime>_winwing.heartbeatInterval then
+					_winwing.lastHeartbeatTime=t
+					local _send={}
+					_send["func"]="heartbeat"
+					_send["msg"]=_winwing.lastHeartbeatTime
+					_winwing.net.send(_send)
+				end
 				--发送之前添加的输出数据（变化发送）
 				local _sendOutput={}
 				_sendOutput["func"]="addOutput"
